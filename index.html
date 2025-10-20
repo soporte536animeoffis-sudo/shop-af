@@ -75,20 +75,46 @@
     <input type="text" placeholder="Buscar productos..." />
   </div>
 
-  <div class="grid">
-    <div class="item">
-      <img src="https://via.placeholder.com/200x200?text=Camisa+Styceht" alt="Camisa Styceht" />
-      <h3>Camisa Styceht</h3>
-      <p class="price">$249 MXN</p>
-      <button class="buy-btn">Comprar</button>
-    </div>
-    <div class="item">
-      <img src="https://via.placeholder.com/200x200?text=Traje+Anime+Offis" alt="Traje Anime Offis" />
-      <h3>Traje Anime Offis</h3>
-      <p class="price">$899 MXN</p>
-      <button class="buy-btn">Comprar</button>
-    </div>
-    <!-- Puedes duplicar este bloque para más productos -->
-  </div>
+  <div class="grid"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC21V6Mkjy8l-XgplQiD6c0PAaOMTaGVu4",
+      authDomain: "shop-87529.firebaseapp.com",
+      projectId: "shop-87529",
+      storageBucket: "shop-87529.appspot.com",
+      messagingSenderId: "287195033559",
+      appId: "1:287195033559:web:dbc72aa0932d32b9206592",
+      measurementId: "G-DBQD3DLD54"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const grid = document.querySelector(".grid");
+
+    async function cargarProductos() {
+      const querySnapshot = await getDocs(collection(db, "productos"));
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+
+        const item = document.createElement("div");
+        item.className = "item";
+        item.innerHTML = `
+          <img src="${data.imagen}" alt="${data.nombre}" />
+          <h3>${data.nombre}</h3>
+          <p>${data.descripcion}</p>
+          <p class="price">$${data.precio} MXN</p>
+          <button class="buy-btn">Comprar</button>
+        `;
+        grid.appendChild(item);
+      });
+    }
+
+    cargarProductos();
+  </script>
 </body>
 </html>
