@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel de Vendedores - Anime Offis</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f0f0;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #ff6600;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    .container {
+      max-width: 600px;
+      margin: 2rem auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 0.5rem;
+      margin: 0.5rem 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #ff6600;
+      color: white;
+      border: none;
+      padding: 0.7rem 1.2rem;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+    .profile-preview {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .profile-preview img {
+      width: 100px;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Panel de Vendedores</h1>
+    <p>Anime Offis MarketPlay</p>
+  </header>
+
+  <div class="container">
+    <div id="login-section">
+      <h2>Iniciar sesión</h2>
+      <input type="email" id="email" placeholder="Correo oficial" />
+      <input type="password" id="password" placeholder="Contraseña" />
+      <button onclick="login()">Entrar</button>
+    </div>
+
+    <div id="panel-section" style="display:none;">
+      <h2>Subir producto</h2>
+      <div class="profile-preview">
+        <img id="profile-img" src="https://via.placeholder.com/100" alt="Perfil" />
+        <p id="vendor-name">Tienda: —</p>
+      </div>
+      <input type="text" id="nombre" placeholder="Nombre del producto" />
+      <textarea id="descripcion" placeholder="Descripción del producto"></textarea>
+      <input type="number" id="precio" placeholder="Precio en MXN" />
+      <input type="text" id="imagen" placeholder="URL de imagen del producto" />
+      <input type="text" id="ubicacion" placeholder="Ubicación (Ej. Guadalajara, Jalisco)" />
+      <input type="text" id="rfc" placeholder="RFC de la empresa registrada" />
+      <button onclick="subirProducto()">Publicar</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC21V6Mkjy8l-XgplQiD6c0PAaOMTaGVu4",
+      authDomain: "shop-87529.firebaseapp.com",
+      projectId: "shop-87529",
+      storageBucket: "shop-87529.appspot.com",
+      messagingSenderId: "287195033559",
+      appId: "1:287195033559:web:dbc72aa0932d32b9206592",
+      measurementId: "G-DBQD3DLD54"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => alert("Sesión iniciada"))
+        .catch(err => alert("Error: " + err.message));
+    }
+
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        document.getElementById("login-section").style.display = "none";
+        document.getElementById("panel-section").style.display = "block";
+        document.getElementById("vendor-name").textContent = "Tienda: " + user.displayName || user.email;
+        document.getElementById("profile-img").src = user.photoURL || "https://via.placeholder.com/100";
+      }
+    });
+
+    async function subirProducto() {
+      const nombre = document.getElementById("nombre").value;
+      const descripcion = document.getElementById("descripcion").value;
+      const precio = document.getElementById("precio").value;
+      const imagen = document.getElementById("imagen").value;
+      const ubicacion = document.getElementById("ubicacion").value;
+      const rfc = document.getElementById("rfc").value;
+
+      const vendedor = auth.currentUser;
+      if (!vendedor) return alert("Debes iniciar sesión");
+
+      await addDoc(collection(db, "productos"), {
+        nombre,
+        descripcion,
+        precio,
+        imagen,
+        ubicacion,
+        rfc,
+        vendedor: vendedor.email,
+        tienda: vendedor.displayName || "Sin nombre",
+        perfil: vendedor.photoURL || "",
+        fecha: new Date().toISOString()
+      });
+
+      alert("Producto publicado");
+    }
+  </script>
+</body>
+</html>
