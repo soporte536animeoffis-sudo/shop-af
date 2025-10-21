@@ -59,8 +59,8 @@
 
   <div class="container">
     <div id="auth-section">
-      <h2>Acceso de Vendedor</h2>
-      <input type="email" id="email" placeholder="Correo oficial" />
+      <h2>Acceso</h2>
+      <input type="email" id="email" placeholder="Correo" />
       <input type="password" id="password" placeholder="Contraseña" />
       <input type="text" id="displayName" placeholder="Nombre de tienda (solo al registrarse)" />
       <input type="text" id="photoURL" placeholder="URL de imagen de perfil (opcional)" />
@@ -78,8 +78,6 @@
       <textarea id="descripcion" placeholder="Descripción del producto"></textarea>
       <input type="number" id="precio" placeholder="Precio en MXN" />
       <input type="text" id="imagen" placeholder="URL de imagen del producto" />
-      <input type="text" id="ubicacion" placeholder="Ubicación (Ej. Guadalajara, Jalisco)" />
-      <input type="text" id="rfc" placeholder="RFC de la empresa registrada" />
       <button id="publicar-btn">Publicar producto</button>
     </div>
   </div>
@@ -103,11 +101,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const loginBtn = document.getElementById("login-btn");
-    const registerBtn = document.getElementById("register-btn");
-    const publicarBtn = document.getElementById("publicar-btn");
-
-    loginBtn.addEventListener("click", () => {
+    document.getElementById("login-btn").addEventListener("click", () => {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
       signInWithEmailAndPassword(auth, email, password)
@@ -115,7 +109,7 @@
         .catch(err => alert("Error: " + err.message));
     });
 
-    registerBtn.addEventListener("click", () => {
+    document.getElementById("register-btn").addEventListener("click", () => {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
       const displayName = document.getElementById("displayName").value;
@@ -141,13 +135,11 @@
       }
     });
 
-    publicarBtn.addEventListener("click", async () => {
+    document.getElementById("publicar-btn").addEventListener("click", async () => {
       const nombre = document.getElementById("nombre").value;
       const descripcion = document.getElementById("descripcion").value;
       const precio = document.getElementById("precio").value;
       const imagen = document.getElementById("imagen").value;
-      const ubicacion = document.getElementById("ubicacion").value;
-      const rfc = document.getElementById("rfc").value;
 
       const vendedor = auth.currentUser;
       if (!vendedor) return alert("Debes iniciar sesión");
@@ -155,10 +147,8 @@
       await addDoc(collection(db, "productos"), {
         nombre,
         descripcion,
-        precio,
+        precio: Number(precio),
         imagen,
-        ubicacion,
-        rfc,
         vendedor: vendedor.email,
         tienda: vendedor.displayName || "Sin nombre",
         perfil: vendedor.photoURL || "",
