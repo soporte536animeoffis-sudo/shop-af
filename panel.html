@@ -5,50 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Panel de Vendedores - Anime Offis</title>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f0f0f0;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background: #ff6600;
-      color: white;
-      padding: 1rem;
-      text-align: center;
-    }
-    .container {
-      max-width: 600px;
-      margin: 2rem auto;
-      background: white;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    input, textarea {
-      width: 100%;
-      padding: 0.5rem;
-      margin: 0.5rem 0;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    button {
-      background: #ff6600;
-      color: white;
-      border: none;
-      padding: 0.7rem 1.2rem;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 1rem;
-    }
-    .profile-preview {
-      text-align: center;
-      margin-bottom: 1rem;
-    }
-    .profile-preview img {
-      width: 100px;
-      border-radius: 50%;
-    }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f0f0; margin: 0; padding: 0; }
+    header { background: #ff6600; color: white; padding: 1rem; text-align: center; }
+    .container { max-width: 600px; margin: 2rem auto; background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    input, textarea { width: 100%; padding: 0.5rem; margin: 0.5rem 0; border-radius: 5px; border: 1px solid #ccc; }
+    button { background: #ff6600; color: white; border: none; padding: 0.7rem 1.2rem; border-radius: 5px; cursor: pointer; margin-top: 1rem; }
+    .profile-preview { text-align: center; margin-bottom: 1rem; }
+    .profile-preview img { width: 100px; border-radius: 50%; }
   </style>
 </head>
 <body>
@@ -57,49 +20,43 @@
     <p>Anime Offis MarketPlay</p>
   </header>
 
-  <div class="container">
-    <div id="auth-section">
-      <h2>Acceso</h2>
-      <input type="email" id="email" placeholder="Correo" />
-      <input type="password" id="password" placeholder="Contraseña" />
-      <input type="text" id="displayName" placeholder="Nombre de tienda (solo al registrarse)" />
-      <input type="text" id="photoURL" placeholder="URL de imagen de perfil (opcional)" />
-      <button id="login-btn">Iniciar sesión</button>
-      <button id="register-btn">Crear cuenta</button>
-    </div>
+  <div class="container" id="auth-section">
+    <h2>Acceso</h2>
+    <input type="email" id="email" placeholder="Correo" />
+    <input type="password" id="password" placeholder="Contraseña" />
+    <input type="text" id="displayName" placeholder="Nombre de tienda (solo al registrarse)" />
+    <input type="text" id="photoURL" placeholder="URL de imagen de perfil (opcional)" />
+    <button id="login-btn">Iniciar sesión</button>
+    <button id="register-btn">Crear cuenta</button>
+  </div>
 
-    <div id="panel-section" style="display:none;">
-      <h2>Subir producto</h2>
-      <div class="profile-preview">
-        <img id="profile-img" src="https://via.placeholder.com/100" alt="Perfil" />
-        <p id="vendor-name">Tienda: —</p>
-      </div>
-      <input type="text" id="nombre" placeholder="Nombre del producto" />
-      <textarea id="descripcion" placeholder="Descripción del producto"></textarea>
-      <input type="number" id="precio" placeholder="Precio en MXN" />
-      <input type="text" id="imagen" placeholder="URL de imagen del producto" />
-      <button id="publicar-btn">Publicar producto</button>
+  <div class="container" id="panel-section" style="display:none;">
+    <div class="profile-preview">
+      <img id="profile-img" src="https://via.placeholder.com/100" alt="Perfil" />
+      <p id="vendor-name">Tienda: —</p>
     </div>
+    <input type="text" id="nombre" placeholder="Nombre del producto" />
+    <textarea id="descripcion" placeholder="Descripción del producto"></textarea>
+    <input type="number" id="precio" placeholder="Precio en MXN" />
+    <input type="text" id="imagen" placeholder="URL de imagen del producto" />
+    <button id="publicar-btn">Publicar producto</button>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+    import { getDatabase, ref, set, push } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyC21V6Mkjy8l-XgplQiD6c0PAaOMTaGVu4",
       authDomain: "shop-87529.firebaseapp.com",
-      projectId: "shop-87529",
-      storageBucket: "shop-87529.appspot.com",
-      messagingSenderId: "287195033559",
-      appId: "1:287195033559:web:dbc72aa0932d32b9206592",
-      measurementId: "G-DBQD3DLD54"
+      databaseURL: "https://shop-87529-default-rtdb.firebaseio.com",
+      projectId: "shop-87529"
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const db = getFirestore(app);
+    const db = getDatabase(app);
 
     document.getElementById("login-btn").addEventListener("click", () => {
       const email = document.getElementById("email").value;
@@ -117,12 +74,15 @@
 
       createUserWithEmailAndPassword(auth, email, password)
         .then(userCredential => {
-          return updateProfile(userCredential.user, {
-            displayName,
-            photoURL
+          updateProfile(userCredential.user, { displayName, photoURL });
+          set(ref(db, "empresas/" + userCredential.user.uid), {
+            nombre: displayName,
+            foto: photoURL,
+            rfc: "—",
+            direccion: "—"
           });
+          alert("Cuenta creada");
         })
-        .then(() => alert("Cuenta creada"))
         .catch(err => alert("Error: " + err.message));
     });
 
@@ -144,18 +104,20 @@
       const vendedor = auth.currentUser;
       if (!vendedor) return alert("Debes iniciar sesión");
 
-      await addDoc(collection(db, "productos"), {
+      const productoRef = ref(db, "productos/" + vendedor.uid);
+      await push(productoRef, {
         nombre,
         descripcion,
         precio: Number(precio),
         imagen,
-        vendedor: vendedor.email,
-        tienda: vendedor.displayName || "Sin nombre",
-        perfil: vendedor.photoURL || "",
         fecha: new Date().toISOString()
       });
 
       alert("Producto publicado");
+      document.getElementById("nombre").value = "";
+      document.getElementById("descripcion").value = "";
+      document.getElementById("precio").value = "";
+      document.getElementById("imagen").value = "";
     });
   </script>
 </body>
