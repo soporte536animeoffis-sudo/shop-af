@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Perfil de Empresa - Anime Offis</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f0f0;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #ff6600;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    .container {
+      max-width: 500px;
+      margin: 2rem auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    img {
+      width: 120px;
+      border-radius: 50%;
+      margin-bottom: 1rem;
+    }
+    .info {
+      text-align: left;
+      margin-top: 1rem;
+    }
+    .info p {
+      margin: 0.5rem 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Perfil de Empresa</h1>
+    <p>Anime Offis MarketPlay</p>
+  </header>
+
+  <div class="container">
+    <img id="empresa-img" src="https://via.placeholder.com/120" alt="Logo empresa" />
+    <h2 id="empresa-nombre">Nombre Comercial</h2>
+    <div class="info">
+      <p><strong>RFC:</strong> <span id="empresa-rfc">—</span></p>
+      <p><strong>Dirección:</strong> <span id="empresa-direccion">—</span></p>
+      <p><strong>Total de productos vendidos:</strong> <span id="empresa-ventas">0</span></p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC21V6Mkjy8l-XgplQiD6c0PAaOMTaGVu4",
+      authDomain: "shop-87529.firebaseapp.com",
+      projectId: "shop-87529",
+      storageBucket: "shop-87529.appspot.com",
+      messagingSenderId: "287195033559",
+      appId: "1:287195033559:web:dbc72aa0932d32b9206592",
+      measurementId: "G-DBQD3DLD54"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, async user => {
+      if (!user) return alert("Debes iniciar sesión");
+
+      // Datos del perfil
+      document.getElementById("empresa-nombre").textContent = user.displayName || "Sin nombre";
+      document.getElementById("empresa-img").src = user.photoURL || "https://via.placeholder.com/120";
+
+      // Buscar datos adicionales en Firestore
+      const perfilRef = doc(db, "empresas", user.uid);
+      const perfilSnap = await getDoc(perfilRef);
+      if (perfilSnap.exists()) {
+        const data = perfilSnap.data();
+        document.getElementById("empresa-rfc").textContent = data.rfc || "—";
+        document.getElementById("empresa-direccion").textContent = data.direccion || "—";
+      }
+
+      // Contar productos vendidos
+      const productosRef = collection(db, "productos");
+      const q = query(productosRef, where("vendedor", "==", user.email));
+      const productosSnap = await getDocs(q);
+      document.getElementById("empresa-ventas").textContent = productosSnap.size;
+    });
+  </script>
+</body>
+</html>
