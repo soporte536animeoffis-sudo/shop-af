@@ -39,6 +39,10 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       padding: 1rem;
       text-align: center;
+      transition: transform 0.2s;
+    }
+    .item:hover {
+      transform: scale(1.02);
     }
     .item img {
       max-width: 100%;
@@ -62,6 +66,8 @@
       border-radius: 5px;
       cursor: pointer;
       margin-top: 0.5rem;
+      text-decoration: none;
+      display: inline-block;
     }
   </style>
 </head>
@@ -72,14 +78,14 @@
   </header>
 
   <div class="search-bar">
-    <input type="text" placeholder="Buscar productos..." />
+    <input type="text" id="busqueda" placeholder="Buscar productos..." />
   </div>
 
-  <div class="grid"></div>
+  <div class="grid" id="grid"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-    import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyC21V6Mkjy8l-XgplQiD6c0PAaOMTaGVu4",
@@ -90,30 +96,56 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const grid = document.querySelector(".grid");
+    const grid = document.getElementById("grid");
+    const busqueda = document.getElementById("busqueda");
+
+    let todosLosProductos = [];
 
     async function cargarProductos() {
       const snapshot = await get(ref(db, "productos"));
-      if (!snapshot.exists()) return;
+      if (!snapshot.exists()) {
+        grid.innerHTML = "<p style='text-align:center;'>No hay productos disponibles por el momento.</p>";
+        return;
+      }
 
       const vendedores = snapshot.val();
+      todosLosProductos = [];
+
       for (const uid in vendedores) {
         const productos = vendedores[uid];
         for (const id in productos) {
           const data = productos[id];
-          const item = document.createElement("div");
-          item.className = "item";
-          item.innerHTML = `
-            <img src="${data.imagen}" alt="${data.nombre}" />
-            <h3>${data.nombre}</h3>
-            <p>${data.descripcion}</p>
-            <p class="price">$${data.precio} MXN</p>
-            <button class="buy-btn">Comprar</button>
-          `;
-          grid.appendChild(item);
+          todosLosProductos.push({ ...data, id, uid });
         }
       }
+
+      mostrarProductos(todosLosProductos);
     }
+
+    function mostrarProductos(lista) {
+      grid.innerHTML = "";
+      lista.forEach(prod => {
+        const item = document.createElement("div");
+        item.className = "item";
+        item.innerHTML = `
+          <img src="${prod.imagen}" alt="${prod.nombre}" />
+          <h3>${prod.nombre}</h3>
+          <p>${prod.descripcion}</p>
+          <p class="price">$${prod.precio} MXN</p>
+          <a class="buy-btn" href="producto.html?id=${prod.id}&uid=${prod.uid}">Ver más</a>
+        `;
+        grid.appendChild(item);
+      });
+    }
+
+    busqueda.addEventListener("input", () => {
+      const texto = busqueda.value.toLowerCase();
+      const filtrados = todosLosProductos.filter(p =>
+        p.nombre.toLowerCase().includes(texto) ||
+        p.descripcion.toLowerCase().includes(texto)
+      );
+      mostrarProductos(filtrados);
+    });
 
     cargarProductos();
   </script>
