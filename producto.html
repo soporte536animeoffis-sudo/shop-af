@@ -1,0 +1,67 @@
+<!-- producto.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detalle del Producto</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 2rem auto; background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    img { max-width: 100%; border-radius: 8px; }
+    h2 { margin-top: 1rem; }
+    .price { color: #ff6600; font-weight: bold; margin: 1rem 0; }
+    .perfil { margin-top: 2rem; border-top: 1px solid #ccc; padding-top: 1rem; text-align: center; }
+    .perfil img { width: 80px; border-radius: 50%; }
+    .verificado { color: green; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="container" id="contenido">
+    <p>Cargando producto...</p>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC21V6Mkjy8l-XgplQiD6c0PAaOMTaGVu4",
+      authDomain: "shop-87529.firebaseapp.com",
+      databaseURL: "https://shop-87529-default-rtdb.firebaseio.com",
+      projectId: "shop-87529"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const params = new URLSearchParams(location.search);
+    const id = params.get("id");
+    const uid = params.get("uid");
+    const cont = document.getElementById("contenido");
+
+    async function cargarProducto() {
+      const prodSnap = await get(child(ref(db), `productos/${uid}/${id}`));
+      if (!prodSnap.exists()) return cont.innerHTML = "<p>Producto no encontrado.</p>";
+      const data = prodSnap.val();
+
+      const empresaSnap = await get(child(ref(db), `empresas/${uid}`));
+      const empresa = empresaSnap.exists() ? empresaSnap.val() : {};
+
+      cont.innerHTML = `
+        <img src="${data.imagen}" alt="${data.nombre}" />
+        <h2>${data.nombre}</h2>
+        <p>${data.descripcion}</p>
+        <p class="price">$${data.precio} MXN</p>
+
+        <div class="perfil">
+          <img src="${empresa.foto || 'https://via.placeholder.com/80'}" alt="Perfil" />
+          <p><strong>${empresa.nombre || 'Tienda sin nombre'}</strong></p>
+          ${empresa.verificado ? '<p class="verificado">✔ Empresa verificada</p>' : '<p style="color:#999;">No verificada</p>'}
+        </div>
+      `;
+    }
+
+    cargarProducto();
+  </script>
+</body>
+</html>
