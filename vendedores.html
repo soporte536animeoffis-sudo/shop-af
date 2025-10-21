@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bienvenida - Anime Offis MarketPlay GDL</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom, #fff5e6, #ffe0cc);
+      overflow: hidden;
+      position: relative;
+    }
+    header {
+      background-color: #ff6600;
+      color: white;
+      padding: 2rem 1rem;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1rem;
+      text-align: center;
+      min-height: 70vh;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 3px solid #ff6600;
+      width: 0;
+      animation: escribir 4s steps(40, end) forwards;
+    }
+    @keyframes escribir {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+    p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin: 2rem auto;
+      opacity: 0;
+      animation: aparecer 2s ease-out 4s forwards;
+    }
+    @keyframes aparecer {
+      to { opacity: 1; }
+    }
+    .btn {
+      background-color: #ff6600;
+      color: white;
+      padding: 0.8rem 2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.3s ease;
+      opacity: 0;
+      animation: aparecer 2s ease-out 5s forwards;
+    }
+    .btn:hover {
+      background-color: #e05500;
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+      color: #777;
+    }
+    .petalo {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: rgba(255, 102, 0, 0.3);
+      border-radius: 50%;
+      animation: flotar 10s linear infinite;
+    }
+    @keyframes flotar {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 id="bienvenida">Bienvenido a Anime Offis MarketPlay GDL</h1>
+  </header>
+
+  <main>
+    <p>
+      Únete a nuestra comunidad de vendedores oficiales y forma parte del movimiento que impulsa el talento local.
+      Comparte tus productos con miles de fans del anime y la cultura creativa en México y Latinoamérica.
+    </p>
+    <a href="panel.html" class="btn">Unirme como vendedor</a>
+  </main>
+
+  <footer>
+    &copy; 2025 Anime Offis GDL · Todos los derechos reservados
+  </footer>
+
+  <script>
+    // Generar pétalos flotantes
+    for (let i = 0; i < 20; i++) {
+      const petalo = document.createElement("div");
+      petalo.className = "petalo";
+      petalo.style.left = Math.random() * 100 + "vw";
+      petalo.style.animationDuration = (6 + Math.random() * 6) + "s";
+      document.body.appendChild(petalo);
+    }
+  </script>
+</body>
+</html>
