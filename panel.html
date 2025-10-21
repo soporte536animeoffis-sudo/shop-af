@@ -1,3 +1,4 @@
+<!-- panel.html con ImgBB integrado -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -38,7 +39,7 @@
     <input type="text" id="nombre" placeholder="Nombre del producto" />
     <textarea id="descripcion" placeholder="Descripción del producto"></textarea>
     <input type="number" id="precio" placeholder="Precio en MXN" />
-    <input type="text" id="imagen" placeholder="URL de imagen del producto" />
+    <input type="file" id="imagen" accept="image/*" />
     <button id="publicar-btn">Publicar producto</button>
   </div>
 
@@ -57,6 +58,8 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getDatabase(app);
+
+    const imgbbKey = "5b0931fc3792f2069b046ef7eed268da";
 
     document.getElementById("login-btn").addEventListener("click", () => {
       const email = document.getElementById("email").value;
@@ -99,17 +102,31 @@
       const nombre = document.getElementById("nombre").value;
       const descripcion = document.getElementById("descripcion").value;
       const precio = document.getElementById("precio").value;
-      const imagen = document.getElementById("imagen").value;
-
+      const imagenInput = document.getElementById("imagen");
       const vendedor = auth.currentUser;
+
       if (!vendedor) return alert("Debes iniciar sesión");
+      if (!imagenInput.files[0]) return alert("Selecciona una imagen");
+
+      const formData = new FormData();
+      formData.append("image", imagenInput.files[0]);
+
+      const upload = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, {
+        method: "POST",
+        body: formData
+      });
+
+      const result = await upload.json();
+      if (!result.success) return alert("Error al subir imagen");
+
+      const imagenURL = result.data.url;
 
       const productoRef = ref(db, "productos/" + vendedor.uid);
       await push(productoRef, {
         nombre,
         descripcion,
         precio: Number(precio),
-        imagen,
+        imagen: imagenURL,
         fecha: new Date().toISOString()
       });
 
@@ -117,7 +134,7 @@
       document.getElementById("nombre").value = "";
       document.getElementById("descripcion").value = "";
       document.getElementById("precio").value = "";
-      document.getElementById("imagen").value = "";
+      imagenInput.value = "";
     });
   </script>
 </body>
