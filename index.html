@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Anime Offis MarketPlay</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #eef3ff;
+      color: #333;
+    }
+    header {
+      background: #0a2e73;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2em;
+    }
+    header p {
+      margin: 5px 0 0;
+      font-size: 1em;
+    }
+    #productos {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 20px;
+    }
+    .producto {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin: 10px;
+      padding: 15px;
+      width: 250px;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .producto:hover {
+      transform: scale(1.03);
+    }
+    .producto img {
+      width: 100%;
+      border-radius: 6px;
+    }
+    .producto h2 {
+      font-size: 1em;
+      margin: 10px 0;
+    }
+    .producto p {
+      margin: 5px 0;
+    }
+    .producto a {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: #0a2e73;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: #0a2e73;
+      color: white;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🛍️ Anime Offis MarketPlay</h1>
+    <p>Explora nuestros productos en Mercado Libre</p>
+  </header>
+
+  <section id="productos">
+    <p>Cargando productos...</p>
+  </section>
+
+  <footer>
+    &copy; 2025 Anime Offis GDL México · Todos los derechos reservados
+  </footer>
+
+  <script>
+    async function cargarProductos() {
+      const contenedor = document.getElementById("productos");
+      contenedor.innerHTML = "";
+
+      try {
+        const res = await fetch("https://api.mercadolibre.com/sites/MLM/search?seller_nickname=ANIMEOFFISGDL");
+        const data = await res.json();
+
+        if (data.results.length === 0) {
+          contenedor.innerHTML = "<p>No se encontraron productos activos.</p>";
+          return;
+        }
+
+        data.results.forEach(producto => {
+          const item = document.createElement("div");
+          item.className = "producto";
+          item.innerHTML = `
+            <img src="${producto.thumbnail}" alt="${producto.title}">
+            <h2>${producto.title}</h2>
+            <p>💲${producto.price}</p>
+            <p>${producto.condition === "new" ? "Nuevo" : "Usado"}</p>
+            <a href="${producto.permalink}" target="_blank">Ver en Mercado Libre</a>
+          `;
+          contenedor.appendChild(item);
+        });
+      } catch (error) {
+        contenedor.innerHTML = "<p>Error al cargar productos. Intenta más tarde.</p>";
+        console.error("Error al obtener productos:", error);
+      }
+    }
+
+    cargarProductos();
+  </script>
+</body>
+</html>
