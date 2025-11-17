@@ -80,46 +80,31 @@
   </header>
 
   <section id="productos">
-    <p>Cargando productos...</p>
+    <!-- Producto 1 -->
+    <div class="producto">
+      <img src="https://http2.mlstatic.com/D_Q_NP_808299-MLM97671240155_112025-L-traje-de-sirvienta-maid-styceht-de-anime-offis.webp" alt="Traje de maid sirvienta de styceht anime offis">
+      <h2>Traje de maid sirvienta de styceht anime offis</h2>
+      <p>💲350 MXN</p>
+      <h7>24 meses de $21</h7>
+      <h3>Recíbelo gratis</h3> <h4>entre el jueves y el viernes</h4>
+      <p>Nuevo</p>
+      <a href="https://articulo.mercadolibre.com.mx/MLM-2551646331-traje-de-sirvienta-maid-styceht-de-anime-offis-_JM#origin=share&sid=share&action=copy" target="_blank">Comprar ahora</a>
+    </div>
+
+    <!-- Producto 2 -->
+    <div class="producto">
+      <img src="https://http2.mlstatic.com/D_NQ_NP_654321-MLM00000000000_1024X768.jpg" alt="Playera Estilo Styceht">
+      <h2>Playera Estilo Styceht</h2>
+      <p>💲249 MXN</p>
+      <p>Nuevo</p>
+      <a href="https://articulo.mercadolibre.com.mx/MLM-0000000001" target="_blank">Ver en Mercado Libre</a>
+    </div>
+
+    <!-- Agrega más productos aquí -->
   </section>
 
   <footer>
     &copy; 2025 Anime Offis GDL México · Todos los derechos reservados
   </footer>
-
-  <script>
-    async function cargarProductos() {
-      const contenedor = document.getElementById("productos");
-      contenedor.innerHTML = "";
-
-      try {
-        const res = await fetch("https://api.mercadolibre.com/sites/MLM/search?seller_nickname=ANIMEOFFISGDL");
-        const data = await res.json();
-
-        if (data.results.length === 0) {
-          contenedor.innerHTML = "<p>No se encontraron productos activos.</p>";
-          return;
-        }
-
-        data.results.forEach(producto => {
-          const item = document.createElement("div");
-          item.className = "producto";
-          item.innerHTML = `
-            <img src="${producto.thumbnail}" alt="${producto.title}">
-            <h2>${producto.title}</h2>
-            <p>💲${producto.price}</p>
-            <p>${producto.condition === "new" ? "Nuevo" : "Usado"}</p>
-            <a href="${producto.permalink}" target="_blank">Ver en Mercado Libre</a>
-          `;
-          contenedor.appendChild(item);
-        });
-      } catch (error) {
-        contenedor.innerHTML = "<p>Error al cargar productos. Intenta más tarde.</p>";
-        console.error("Error al obtener productos:", error);
-      }
-    }
-
-    cargarProductos();
-  </script>
 </body>
 </html>
